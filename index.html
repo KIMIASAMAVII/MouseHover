@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <title>MouseHover</title>
+
+    <style>
+      .div1 {
+        width: 200px;
+        height: 50px;
+        background-color: rgba(247, 233, 218, 0.7);
+        position: absolute;
+        text-align: center;
+        top: 50%;
+        left: 40%;
+      }
+
+      body {
+        background-color: rgb(184, 145, 104);
+        width: 100%;
+        height: 100%;
+      }
+    </style>
+
+    <script src="./jquery-3.6.0.min.js"></script>
+
+    <script>
+      var dragging = false;
+      var pause_handler;
+
+      Element.prototype.drag = function () {
+        var mousemove = function (e) {
+          dragging = true;
+          this.style.left = e.clientX - this.dragStartX + "px";
+          this.style.top = e.clientY - this.dragStartY + "px";
+        }.bind(this);
+
+        var mouseup = function (e) {
+          dragging = false;
+          console.log("dragging: ", dragging);
+
+          document.removeEventListener("mousemove", mousemove);
+          document.removeEventListener("mouseup", mouseup);
+        }.bind(this);
+
+        this.addEventListener(
+          "mousedown",
+          function (e) {
+            this.dragStartX = e.offsetX;
+            this.dragStartY = e.offsetY;
+
+            document.addEventListener("mousemove", mousemove);
+            document.addEventListener("mouseup", mouseup);
+          }.bind(this)
+        );
+
+        this.style.position = "absolute";
+      };
+
+      $(() => {
+        $("#div1")[0].drag();
+
+        $("#div1").on("mouseover", () => {
+          console.log("mouse over on div");
+          pause_handler = setTimeout(() => {
+            if (!dragging) {
+              $("#div1").html("subtitle stop");
+            }
+          }, 1000);
+        });
+
+        $("#div1").on("mouseout", () => {
+          clearTimeout(pause_handler);
+          $("#div1").html(" subtitle is playing ");
+        });
+      });
+    </script>
+  </head>
+
+  <body>
+    <div class="div1" id="div1">subtitle is playing</div>
+  </body>
+  
+</html>
